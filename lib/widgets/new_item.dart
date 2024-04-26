@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 
 class NewItem extends StatelessWidget {
-  const NewItem({super.key});
+  const NewItem({
+    super.key,
+    required this.onSave,
+  });
+
+  final Function(String item) onSave;
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController controller = TextEditingController();
+
     return AlertDialog(
       title: const Text("Insert new item!"),
-      content: const TextField(
-        decoration: InputDecoration(
+      content: TextField(
+        controller: controller,
+        decoration: const InputDecoration(
           border: OutlineInputBorder(),
           label: Text("Item"),
         ),
@@ -25,10 +33,7 @@ class NewItem extends StatelessWidget {
         ),
         TextButton(
           onPressed: () {
-            Navigator.of(
-              context,
-              rootNavigator: true,
-            ).pop();
+            onSave(controller.text.trim());
           },
           child: const Text("Save!"),
         ),
