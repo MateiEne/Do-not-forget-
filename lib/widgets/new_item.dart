@@ -1,59 +1,32 @@
 import 'package:flutter/material.dart';
 
-class NewItem extends StatefulWidget {
+class NewItem extends StatelessWidget {
   const NewItem({
     super.key,
-    required this.onSave,
+    required this.item,
   });
 
-  final Function(String item) onSave;
-
-  @override
-  State<NewItem> createState() => _NewItemState();
-}
-
-class _NewItemState extends State<NewItem> {
-  final TextEditingController controller = TextEditingController();
-  String errorText = "";
+  final String item;
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text("Insert new item!"),
-      content: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          border: const OutlineInputBorder(),
-          label: const Text("Item"),
-          errorText: errorText == "" ? null : errorText,
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+      ),
+      child: Card(
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        elevation: 10,
+        shadowColor: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+        child: ListTile(
+          key: ValueKey<String>(item),
+          title: Text(item),
+          trailing: const Icon(Icons.drag_handle_sharp),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(
-              context,
-              rootNavigator: true,
-            ).pop();
-          },
-          child: const Text("Cancel!"),
-        ),
-        TextButton(
-          onPressed: () {
-            if (controller.text.trim().isEmpty) {
-              setState(() {
-                errorText = "Please enter an item!";
-              });
-
-              return;
-            }
-            widget.onSave(controller.text.trim());
-          },
-          child: const Text("Save!"),
-        ),
-      ],
-      actionsAlignment: MainAxisAlignment.spaceBetween,
-      backgroundColor: Theme.of(context).dialogBackgroundColor,
     );
   }
 }

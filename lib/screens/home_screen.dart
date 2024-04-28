@@ -1,4 +1,5 @@
 import 'package:dont_forget/widgets/new_item.dart';
+import 'package:dont_forget/widgets/new_item_dialog.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,7 +15,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _newItemButtonPressed(BuildContext context) {
     showDialog(
       context: context,
-      builder: (BuildContext context) => NewItem(onSave: _addItem),
+      builder: (BuildContext context) => NewItemDialog(onSave: _addItem),
       barrierDismissible: false,
     );
   }
@@ -39,35 +40,44 @@ class _HomeScreenState extends State<HomeScreen> {
 
     setState(() {
       _items.add(item);
-
-      print(_items);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final Color oddItemColor = colorScheme.primary.withOpacity(0.05);
-    final Color evenItemColor = colorScheme.primary.withOpacity(0.15);
+    // final Color evenItemColor = colorScheme.primary.withOpacity(0.15);
 
-    /// TODO: replace ListTile with a custom card widget
+    Widget mainContent = const Center(
+      child: Text("No items added yet."),
+    );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Do not forget!',
-        ),
-        centerTitle: true,
-      ),
-      body: ReorderableListView.builder(
+    if (_items.isNotEmpty) {
+      mainContent = ReorderableListView.builder(
         itemCount: _items.length,
         itemBuilder: (BuildContext context, int index) {
           return Dismissible(
             key: Key(_items[index]),
             direction: DismissDirection.endToStart,
-            background: Container(
+            background: Card(
               color: Colors.red,
-              margin: const EdgeInsets.symmetric(horizontal: 20),
+              margin: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 5,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 20,
+                ),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    "Remove item",
+                  ),
+                ),
+              ),
             ),
             onDismissed: (direction) {
               final int itemIndex = index;
@@ -95,11 +105,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               );
             },
-            child: ListTile(
-              key: ValueKey<String>(_items[index]),
-              tileColor: index.isOdd ? oddItemColor : evenItemColor,
-              title: Text(_items[index]),
-              trailing: const Icon(Icons.drag_handle_sharp),
+            child: NewItem(
+              item: _items[index],
             ),
           );
         },
@@ -113,7 +120,16 @@ class _HomeScreenState extends State<HomeScreen> {
             _items.insert(newIndex, item);
           });
         },
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Do not forget!',
+        ),
       ),
+      body: mainContent,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           _newItemButtonPressed(context);
