@@ -38,8 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final Color oddItemColor = colorScheme.primary.withOpacity(0.05);
     final Color evenItemColor = colorScheme.primary.withOpacity(0.15);
 
-
-    /// TODO: make sure that it can add equal items and remove and undo the remove on items list
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -51,16 +49,15 @@ class _HomeScreenState extends State<HomeScreen> {
         itemCount: _items.length,
         itemBuilder: (BuildContext context, int index) {
           return Dismissible(
-            key: ValueKey<String>(_items[index]),
+            key: Key(_items[index]),
             direction: DismissDirection.endToStart,
             background: Container(
-              padding: EdgeInsets.symmetric(
-                vertical: 10,
-                horizontal: 10,
-              ),
               color: Colors.red,
             ),
             onDismissed: (direction) {
+              final int itemIndex = index;
+              final String item = _items[itemIndex];
+
               setState(() {
                 _items.removeAt(index);
               });
@@ -71,19 +68,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   duration: const Duration(
                     seconds: 3,
                   ),
-                  content: Text("${_items[index]} removed"),
+                  content: Text("$item removed"),
                   action: SnackBarAction(
                     label: 'Undo',
                     onPressed: () {
                       setState(() {
-                        _items.insert(index, _items[index]);
+                        _items.insert(itemIndex, item);
                       });
                     },
                   ),
                 ),
               );
+
             },
             child: ListTile(
+              key: ValueKey<String>(_items[index]),
               tileColor: index.isOdd ? oddItemColor : evenItemColor,
               title: Text(_items[index]),
               trailing: const Icon(Icons.drag_handle_sharp),
