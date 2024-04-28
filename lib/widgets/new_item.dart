@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class NewItem extends StatelessWidget {
+class NewItem extends StatefulWidget {
   const NewItem({
     super.key,
     required this.onSave,
@@ -9,16 +9,23 @@ class NewItem extends StatelessWidget {
   final Function(String item) onSave;
 
   @override
-  Widget build(BuildContext context) {
-    TextEditingController controller = TextEditingController();
+  State<NewItem> createState() => _NewItemState();
+}
 
+class _NewItemState extends State<NewItem> {
+  final TextEditingController controller = TextEditingController();
+  String errorText = "";
+
+  @override
+  Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text("Insert new item!"),
       content: TextField(
         controller: controller,
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          label: Text("Item"),
+        decoration: InputDecoration(
+          border: const OutlineInputBorder(),
+          label: const Text("Item"),
+          errorText: errorText == "" ? null : errorText,
         ),
       ),
       actions: [
@@ -33,7 +40,14 @@ class NewItem extends StatelessWidget {
         ),
         TextButton(
           onPressed: () {
-            onSave(controller.text.trim());
+            if (controller.text.trim().isEmpty) {
+              setState(() {
+                errorText = "Please enter an item!";
+              });
+
+              return;
+            }
+            widget.onSave(controller.text.trim());
           },
           child: const Text("Save!"),
         ),

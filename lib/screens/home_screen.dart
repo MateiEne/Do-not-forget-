@@ -20,15 +20,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _addItem(String item) {
+    Navigator.of(
+      context,
+      rootNavigator: true,
+    ).pop();
+
+    if (_items.contains(item)) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: const Duration(seconds: 3),
+          content: Text("$item is already in the list"),
+        ),
+      );
+
+      return;
+    }
+
     setState(() {
       _items.add(item);
 
       print(_items);
-
-      Navigator.of(
-        context,
-        rootNavigator: true,
-      ).pop();
     });
   }
 
@@ -37,6 +49,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final Color oddItemColor = colorScheme.primary.withOpacity(0.05);
     final Color evenItemColor = colorScheme.primary.withOpacity(0.15);
+
+    /// TODO: replace ListTile with a custom card widget
 
     return Scaffold(
       appBar: AppBar(
@@ -53,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
             direction: DismissDirection.endToStart,
             background: Container(
               color: Colors.red,
+              margin: const EdgeInsets.symmetric(horizontal: 20),
             ),
             onDismissed: (direction) {
               final int itemIndex = index;
@@ -79,7 +94,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               );
-
             },
             child: ListTile(
               key: ValueKey<String>(_items[index]),
