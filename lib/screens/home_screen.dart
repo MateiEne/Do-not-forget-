@@ -1,6 +1,7 @@
 import 'package:dont_forget/widgets/new_item.dart';
 import 'package:dont_forget/widgets/new_item_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,7 +11,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<String> _items = [];
+  List<String> _items = [];
 
   void _newItemButtonPressed(BuildContext context) {
     showDialog(
@@ -20,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _addItem(String item) {
+  void _addItem(String item) async {
     Navigator.of(
       context,
       rootNavigator: true,
@@ -38,8 +39,25 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
+    final prefs = await SharedPreferences.getInstance();
+
     setState(() {
       _items.add(item);
+
+      prefs.setStringList('items', _items);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPreferences();
+  }
+
+  void _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _items = prefs.getStringList('items') ?? [];
     });
   }
 
