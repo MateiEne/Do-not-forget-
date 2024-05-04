@@ -97,12 +97,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            onDismissed: (direction) {
+            onDismissed: (direction) async {
               final int itemIndex = index;
               final String item = _items[itemIndex];
 
+              final prefs = await SharedPreferences.getInstance();
+
               setState(() {
                 _items.removeAt(index);
+
+                prefs.setStringList('items', _items);
               });
 
               ScaffoldMessenger.of(context).clearSnackBars();
@@ -114,9 +118,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   content: Text("$item removed"),
                   action: SnackBarAction(
                     label: 'Undo',
-                    onPressed: () {
+                    onPressed: () async {
+                      final prefs = await SharedPreferences.getInstance();
                       setState(() {
                         _items.insert(itemIndex, item);
+
+                        prefs.setStringList('items', _items);
                       });
                     },
                   ),
@@ -128,7 +135,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
-        onReorder: (int oldIndex, int newIndex) {
+        onReorder: (int oldIndex, int newIndex) async {
+          final prefs = await SharedPreferences.getInstance();
+
           setState(() {
             if (oldIndex < newIndex) {
               newIndex -= 1;
@@ -136,6 +145,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
             final String item = _items.removeAt(oldIndex);
             _items.insert(newIndex, item);
+
+            prefs.setStringList('items', _items);
           });
         },
       );
